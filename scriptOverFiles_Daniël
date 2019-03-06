@@ -1,0 +1,29 @@
+form Read all files of the given type from the given directory
+   sentence Source_directory ./PITCH2
+   sentence File_name_or_initial_substring ADU
+   sentence File_extension .Pitch
+endform
+
+# https://stackoverflow.com/questions/48055876/how-to-get-or-save-the-pitch-listing-in-praat-using-scripting
+
+Create Strings as file list... list 'source_directory$'/'file_name_or_initial_substring$'*'file_extension$'
+head_words = selected("Strings")
+file_count = Get number of strings
+writeFileLine: "./pitch_list.csv", "object,pitch,class"
+
+for current_file from 1 to file_count
+   select Strings list
+   filename$ = Get string... current_file
+   Read from file... 'source_directory$'/'filename$'
+   name$ = filename$ - file_extension$
+   tag$ = right$(name$, 2)
+   select Pitch 'name$'
+	no_of_frames = Get number of frames
+	for frame from 1 to no_of_frames
+    		time = Get time from frame number: frame
+    		pitch = Get value in frame: frame, "Hertz"
+    		appendFileLine: "pitch_list.txt", "'current_file','pitch', 'tag$'"
+	endfor   
+   select Pitch 'name$'
+   Remove
+endfor
